@@ -24,6 +24,14 @@ const PROXY_PACKAGE = '@deepseek-ai/dsh-http-proxy'
 const INTERNET_SETTINGS = 'HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings'
 /** Every name the launcher reads its launch policy from; any non-empty one means it already acted. */
 const PROXY_ENV_NAMES = ['http_proxy', 'HTTP_PROXY', 'https_proxy', 'HTTPS_PROXY', 'all_proxy', 'ALL_PROXY']
+/**
+ * Process-wide record that the proxy names in `process.env` were published by this plugin.
+ *
+ * Installing a policy republishes those names, so a reloaded plugin cannot tell its own values
+ * from ones the user exported at launch by looking at the environment alone; without this flag a
+ * remount would mistake itself for a launch policy and leave the proxy switched off.
+ */
+const INSTALLED_BY_PLUGIN = Symbol.for('dsh.system-proxy.installed')
 
 /**
  * Build the two log sinks used by this plugin.
@@ -224,7 +232,7 @@ export async function apply(ctx, config = {}) {
       return
     }
     const exported = PROXY_ENV_NAMES.find((name) => (process.env[name] ?? '').trim() !== '')
-    if (exported !== undefined) {
+    if (exported !== undefined && globalThis[INSTALLED_BY_PLUGIN] !== true) {
       info(`${exported} is already set; keeping the launch proxy policy the Harness installed from it`)
       return
     }
@@ -256,7 +264,11 @@ export async function apply(ctx, config = {}) {
 
   const { installProxyFromEnvironment } = await loadProxyLibrary()
   const dispose = await installProxyFromEnvironment(environment, (message) => warn(message))
-  ctx.effect(() => dispose)
+  globalThis[INSTALLED_BY_PLUGIN] = true
+  ctx.effect(() => async () => {
+    delete globalThis[INSTALLED_BY_PLUGIN]
+    await dispose()
+  })
   info(
     `outbound HTTP now goes through ${resolved.httpsProxy ?? resolved.httpProxy}` +
       ` (bypass: ${noProxy === '' ? 'loopback only' : noProxy})`,
