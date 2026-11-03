@@ -1,0 +1,3 @@
+- insert:
+    - id: system-proxy
+      name: '@local/dsh-system-proxy'

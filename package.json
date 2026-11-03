@@ -1,0 +1,36 @@
+{
+  "name": "@local/dsh-system-proxy",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Route DeepSeek Harness outbound HTTP through the Windows system proxy.",
+  "license": "MIT",
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "proxy",
+    "windows",
+    "system-proxy"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Wit-2k/dsh-system-proxy.git"
+  },
+  "homepage": "https://github.com/Wit-2k/dsh-system-proxy#readme",
+  "exports": {
+    ".": "./index.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
+    "README.md"
+  ],
+  "dsh": {
+    "bundle": { "patch": "./cordis.patch.yml" }
+  }
+}

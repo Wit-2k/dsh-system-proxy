@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "System Proxy",
+    "description": "Sends the Harness' outbound HTTP through the Windows system proxy (Internet Settings)."
+  }
+}

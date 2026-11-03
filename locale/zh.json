@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "系统代理",
+    "description": "让 Harness 发出的 HTTP 请求走 Windows 系统代理（Internet 设置）。"
+  }
+}
